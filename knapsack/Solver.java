@@ -229,16 +229,18 @@ public class Solver {
             taken[Idx] = 1;
             sum_value += values[Idx];
         }
+        
+        for(int i=0; i < items; i++){
+            System.out.print(taken[i]+" ");
+        }
+
+        System.out.println("");  
         if(sum_value == value){
             System.out.println("Equal!!!");
         }
         else{
             System.out.println("Not Equal!!!");
         }
-        for(int i=0; i < items; i++){
-            System.out.print(taken[i]+" ");
-        }
-        System.out.println("");  
     }
     /**
      * Read the instance, solve it, and print the solution in the standard output

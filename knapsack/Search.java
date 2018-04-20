@@ -55,34 +55,55 @@ public class Search{
 	}
 
 	//search whether to choose idx
-	public static int DFS(int opt,ArrayList<Node> _arr,int[] _sumLast,
+	public int DFS(int opt,ArrayList<Node> _arr,int[] _sumLast,
 			 int sumweight,int sumvalue, int idx,Stack<Integer> ta){
+		//System.out.println("SumWeight: "+sumweight+" , SumValue: "+sumvalue);
+		//this if statement must be put first so as to detect the target optima
+		if(sumweight > this.capac) return 0;
+		if(sumvalue == opt) return 1;
 		if(idx>_arr.size()-1) return 0;
 		if(sumvalue+_sumLast[idx]<opt){
 			return 0;
 		}
-		if(sumvalue == opt){
-			return 1;
-		}
-		//if(sumweight > capacity) return 0;
+		
 		int temp;
 		temp = DFS(opt,_arr,_sumLast,sumweight,sumvalue,idx+1,ta);
 		if(temp == 1) return 1;
 		ta.push(idx);
+		//System.out.println("Push "+idx);
 		sumweight += _arr.get(idx).weight;
 		sumvalue  += _arr.get(idx).value;
 		temp = DFS(opt,_arr,_sumLast,sumweight,sumvalue,idx+1,ta);
-		if(temp == 1) return 1;
+		if(temp == 1){
+			//System.out.println("Choose: "+idx+"!!!");
+			return 1;
+		} 
 		ta.pop();
-		sumweight += _arr.get(idx).weight;
-		sumvalue  += _arr.get(idx).value;
+		sumweight -= _arr.get(idx).weight;
+		sumvalue  -= _arr.get(idx).value;
 		return 0;
 	}
 
+	public void PrintArray(int[] _arr){
+		for(int i = 0; i < _arr.length; i++){
+			System.out.print(_arr[i]+" ");
+		}
+		System.out.println("");
+	}
+	public void PrintArray(ArrayList<Node> _arr){
+		for(int i = 0; i < _arr.size(); i++){
+			System.out.println("Weight: "+_arr.get(i).weight + " , Value: "+_arr.get(i).value +" , Index: "+_arr.get(i).idx);
+		}
+		System.out.println("");
+	}
 	public void work(){
 		SumLast = new int[this.lens];
 		Collections.sort(arr,new SortByDiv());
+		//PrintArray(arr);
 		sumarr(SumLast,arr);
+		//PrintArray(SumLast);
+		//System.out.println("Theoretical Max Value: " + this.optima);
+		//System.out.println("Theoretical capacity: "+this.capac);
 		ans = new Stack<Integer>();
 		DFS(this.optima,arr,SumLast,0,0,0,ans);
 	}
