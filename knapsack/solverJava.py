@@ -20,8 +20,9 @@ def solve_it(input_data):
 
     # removes the temporay file
     os.remove(tmp_file_name)
-
-    return stdout.strip()
+#add .decode("utf-8") to address the problem of cross line in windows
+#https://www.coursera.org/learn/discrete-optimization/discussions/weeks/2/threads/K2j5MD6NEeew7Q7A7m3f-g
+    return stdout.strip().decode("utf-8")
 
 
 import sys
@@ -31,7 +32,7 @@ if __name__ == '__main__':
         file_location = sys.argv[1].strip()
         with open(file_location, 'r') as input_data_file:
             input_data = input_data_file.read()
-        print solve_it(input_data)
+        print(solve_it(input_data))
     else:
         print('This test requires an input file.  Please select one from the data directory. (i.e. python solver.py ./data/ks_4_0)')
 
