@@ -8,9 +8,10 @@ import java.util.Comparator;
 public class Search{
 	ArrayList<Node> arr = new ArrayList<Node>();
 	int lens;
-	int[] SumLast;//SumLast[i] sum from i to the last;
-	int optima;
-	int capac;//capacity;
+	int[] SumValLast;//SumLast[i] sum from i to the last;
+	int[] SumWeightLast;
+	int optimaVal;
+	int optimaWeight;//MaxWeight;
 	public Stack<Integer> ans;
 	class Node{
 		public int weight;
@@ -33,7 +34,7 @@ public class Search{
 		}
 	}
 	
-	public Search(int[] w,int[] v,int[] taken,int items,int opt,int capacity){
+	public Search(int[] w,int[] v,int[] taken,int items,int optVal,int optW){
 		for(int i = 0; i < items; i++){
 			if(taken[i] == 1){
 				Node temp = new Node(w[i],v[i],i);
@@ -42,45 +43,60 @@ public class Search{
 			}
 		}
 		this.lens = items;
-		this.optima = opt;
-		this.capac = capacity;
+		this.optimaVal = optVal;
+		this.optimaWeight = optW;
 	}
 
-	public static void sumarr(int[] s,ArrayList<Node> _arr){
+	public void sumValArr(int[] s,ArrayList<Node> _arr){
 		int sum = 0;
 		for(int i = _arr.size()-1; i >= 0; i--){
 			sum += _arr.get(i).value;
 			s[i] = sum;
 		}
 	}
-
+	public void sumWeightArr(int[] s,ArrayList<Node> _arr){
+		int sum = 0;
+		for(int i = _arr.size()-1; i >= 0; i--){
+			sum += _arr.get(i).weight;
+			s[i] = sum;
+		}
+	}
 	//search whether to choose idx
-	public int DFS(int opt,ArrayList<Node> _arr,int[] _sumLast,
-			 int sumweight,int sumvalue, int idx,Stack<Integer> ta){
+	//prefer choose items[idx] first so as to take advantage of bound
+	public int DFS(int sumweight,int sumvalue, int idx,Stack<Integer> ta){
+		//System.out.println("Sum Weight: "+sumweight);
+		//System.out.println("Sum Value: "+sumvalue);
+		//System.out.println("Index: "+idx);
 		//System.out.println("SumWeight: "+sumweight+" , SumValue: "+sumvalue);
 		//this if statement must be put first so as to detect the target optima
-		if(sumweight > this.capac) return 0;
-		if(sumvalue == opt) return 1;
-		if(idx>_arr.size()-1) return 0;
-		if(sumvalue+_sumLast[idx]<opt){
+		if((sumweight > this.optimaWeight) || (sumvalue > this.optimaVal) || (idx>arr.size()-1) ){
+			//System.out.println("Cut at "+idx);
 			return 0;
-		}
+		} 
+		if(sumvalue == this.optimaVal) return 1;
+		if(sumvalue+SumValLast[idx] < this.optimaVal || sumweight+SumWeightLast[idx] < this.optimaWeight){
+			//System.out.println("Cut at "+idx);
+			return 0;
+		} 
 		
 		int temp;
-		temp = DFS(opt,_arr,_sumLast,sumweight,sumvalue,idx+1,ta);
-		if(temp == 1) return 1;
 		ta.push(idx);
 		//System.out.println("Push "+idx);
-		sumweight += _arr.get(idx).weight;
-		sumvalue  += _arr.get(idx).value;
-		temp = DFS(opt,_arr,_sumLast,sumweight,sumvalue,idx+1,ta);
+		sumweight += arr.get(idx).weight;
+		sumvalue  += arr.get(idx).value;
+
+		temp = DFS(sumweight,sumvalue,idx+1,ta);
 		if(temp == 1){
 			//System.out.println("Choose: "+idx+"!!!");
 			return 1;
 		} 
 		ta.pop();
-		sumweight -= _arr.get(idx).weight;
-		sumvalue  -= _arr.get(idx).value;
+		//System.out.println("Pop "+idx);
+		sumweight -= arr.get(idx).weight;
+		sumvalue  -= arr.get(idx).value;
+	
+		temp = DFS(sumweight,sumvalue,idx+1,ta);
+		if(temp == 1) return 1;
 		return 0;
 	}
 
@@ -97,14 +113,20 @@ public class Search{
 		System.out.println("");
 	}
 	public void work(){
-		SumLast = new int[this.lens];
+		SumValLast = new int[this.lens];
+		SumWeightLast = new int[this.lens];
 		Collections.sort(arr,new SortByDiv());
 		//PrintArray(arr);
-		sumarr(SumLast,arr);
-		//PrintArray(SumLast);
-		//System.out.println("Theoretical Max Value: " + this.optima);
-		//System.out.println("Theoretical capacity: "+this.capac);
+
+		sumValArr(SumValLast,arr);
+		sumWeightArr(SumWeightLast,arr);
+		//PrintArray(SumValLast);
+		//PrintArray(SumWeightLast);
+		System.out.println("Optima Value: " + this.optimaVal);
+		System.out.println("Optima Weight: "+ this.optimaWeight);
 		ans = new Stack<Integer>();
-		DFS(this.optima,arr,SumLast,0,0,0,ans);
+
+		
+		DFS(0,0,0,ans);
 	}
 }

@@ -137,7 +137,7 @@ public class Solver {
         System.out.println(""); 
     }
      
-    public static void dp_solver3(int items,int capacity,List<String> lines,int[] values,int[] weights){
+    public static void dp_solver3(int items,int capacity,int[] values,int[] weights){
         //System.out.println("Items: "+items);
         //System.out.println("Capacity: "+capacity);
         //System.out.println("Items*Capacity: "+items*capacity);
@@ -178,27 +178,59 @@ public class Solver {
         value = dp[0][capacity];
         // prepare the solution in the specified output format
         System.out.println(value+" 1");
+
         for(int i=0; i < items; i++){
-            System.out.print(taken[i]+" ");
+            //System.out.print(taken[i]+" ");
         }
         System.out.println("");
         System.out.println("Count = "+count); 
         System.out.println("Select = "+count2); 
     }
 
-    public static void dp_search_solver1(int items,int capacity,List<String> lines,int[] values,int[] weights){
+
+    public static void dp_solver4(int items,int capacity,int[] values,int[] weights){
+        dpSolver sov = new dpSolver(items,capacity);
+        ArrayList<Integer> Selected;
+        int[] taken = new int[items];
+        int sum_value = 0;
+
+        Selected = sov.solve(weights,values);
+        int isFinished = sov.nextCapacity;
+        while(isFinished!=-1){
+            //System.out.println("NextItems: "+Selected.get(Selected.size()-1)+" , nextCapacity: "+isFinished);
+            sov = new dpSolver(Selected.get(Selected.size()-1),isFinished);
+            Selected.addAll(sov.solve(weights,values));
+            isFinished = sov.nextCapacity;
+        }
+        for(Integer Idx: Selected){
+            taken[Idx] = 1;
+            sum_value += values[Idx];
+        }
+        System.out.println(sum_value+" 1");
+
+        for(int i=0; i < items; i++){
+            System.out.print(taken[i]+" ");
+        }
+        System.out.println(""); 
+
+    }
+
+    public static void dp_search_solver1(int items,int capacity,int[] values,int[] weights){
         int value = 0;
         int weight = 0;
         int[] taken = new int[items];
 
         int[][] dp = new int[1][capacity+1];
+        int[][] dpw = new int[1][capacity+1];
 
         for(int i = 0; i <= capacity; i++){
+            //System.out.println("Init");
             if(i< weights[0]){
                 dp[0][i] = 0;
             }
             else{
                 dp[0][i] = values[0];
+                dpw[0][i] = weights[0];
                 taken[0] = 1;
             }
         }
@@ -210,6 +242,7 @@ public class Solver {
                     count++;
                     //System.out.println("(i, j) is ("+i+","+j+")");
                     taken[i] = 1;
+                    dpw[0][j] = dpw[0][val]+weights[i];
                     dp[0][j] = dp[0][val]+values[i];
                     //System.out.println("DP("+i+","+j+") = "+dp[0][j]);
                 }
@@ -217,7 +250,9 @@ public class Solver {
         }
 
         value = dp[0][capacity];
-        Search s = new Search(weights,values,taken,items,value,capacity);
+        int optW = dpw[0][capacity];
+
+        Search s = new Search(weights,values,taken,items,value,optW);
         s.work();
         Stack<Integer> ans = s.ans;
         System.out.println(value+" 1");
@@ -247,7 +282,7 @@ public class Solver {
      */
     public static void solve(String[] args) throws IOException {
         String fileName = null;
-        
+
         // get the temp file name
         for(String arg : args){
             if(arg.startsWith("-file=")){
@@ -256,7 +291,7 @@ public class Solver {
         }
         if(fileName == null)
             return;
-        
+
         // read the lines out of the file
         List<String> lines = new ArrayList<String>();
 
@@ -302,8 +337,10 @@ public class Solver {
             dp_solver3(items,capacity,lines);
         }
         */
-        //dp_solver1(items,capacity,lines);
-        dp_search_solver1(items,capacity,lines,values,weights);
+        //dp_solver3(items,capacity,values,weights);
+
+        dp_solver4(items,capacity,values,weights);
+        //dp_search_solver1(items,capacity,lines,values,weights);
        
     }
 }
