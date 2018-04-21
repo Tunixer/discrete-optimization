@@ -69,20 +69,10 @@ public class Solver {
         }
         System.out.println("");  
     }
-    public static void dp_solver1(int items,int capacity,List<String> lines){
+    public static void dp_solver1(int items,int capacity,int[] values, int[] weights){
         //System.out.println("Items: "+items);
         //System.out.println("Capacity: "+capacity);
         //System.out.println("Items*Capacity: "+items*capacity);
-        int[] values = new int[items];
-        int[] weights = new int[items];
-
-        for(int i=1; i < items+1; i++){
-          String line = lines.get(i);
-          String[] parts = line.split("\\s+");
-
-          values[i-1] = Integer.parseInt(parts[0]);
-          weights[i-1] = Integer.parseInt(parts[1]);
-        }
 
         int value = 0;
         int weight = 0;
@@ -337,7 +327,7 @@ public class Solver {
             dp_solver3(items,capacity,lines);
         }
         */
-        //dp_solver3(items,capacity,values,weights);
+        //dp_solver1(items,capacity,values,weights);
 
         dp_solver4(items,capacity,values,weights);
         //dp_search_solver1(items,capacity,lines,values,weights);
