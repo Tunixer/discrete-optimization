@@ -1,30 +1,30 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import Queue
-q = Queue.Queue()
+import queue
+q = queue.Queue()
 def DFS(colorArr, Graph, Node, colorNum):
     if Node == len(colorArr):
-        return true;
+        return True;
     for i in range(colorNum):
-        if IsColored(Graph, Node, i):
+        if IsColored(colorArr, Graph, Node, i):
             colorArr[Node] = i
             q.put(i)
             temp = DFS(colorArr, Graph, Node+1, colorNum)
-            if temp == true:
-                return true
+            if temp == True:
+                return True
             colorArr[Node] = -1
             q.get()
-    return false
+    return False
 
 '''
 whether Node can be colored with colorIdx
 '''
-def IsColored(Graph, Node, colorIdx):
+def IsColored(colarArr, Graph, Node, colorIdx):
     temp = Graph[Node]
     for col in temp:
-        if colorIdx == col:
-            return false;
-    return true
+        if colorIdx == colarArr[col]:
+            return False;
+    return True
 
 def solve_it(input_data):
     # Modify this code to run your optimization algorithm
@@ -50,10 +50,11 @@ def solve_it(input_data):
 
     # build a trivial solution
     # every node has its own color
-
-    ask = DFS(colorArr, Graph, 0, 10)
+    ask = False
+    if node_count < 1000:
+        ask = DFS(colorArr, Graph, 0, 5)
     solution = []
-    if ask == true:
+    if ask == True:
         while not q.empty():
             solution.append(q.get())
 
