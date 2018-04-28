@@ -1,6 +1,30 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import Queue
+q = Queue.Queue()
+def DFS(colorArr, Graph, Node, colorNum):
+    if Node == len(colorArr):
+        return true;
+    for i in range(colorNum):
+        if IsColored(Graph, Node, i):
+            colorArr[Node] = i
+            q.put(i)
+            temp = DFS(colorArr, Graph, Node+1, colorNum)
+            if temp == true:
+                return true
+            colorArr[Node] = -1
+            q.get()
+    return false
 
+'''
+whether Node can be colored with colorIdx
+'''
+def IsColored(Graph, Node, colorIdx):
+    temp = Graph[Node]
+    for col in temp:
+        if colorIdx == col:
+            return false;
+    return true
 
 def solve_it(input_data):
     # Modify this code to run your optimization algorithm
@@ -11,16 +35,29 @@ def solve_it(input_data):
     first_line = lines[0].split()
     node_count = int(first_line[0])
     edge_count = int(first_line[1])
+    Graph = []
+    colorArr = []
+    for i in range(node_count):
+        Graph.append([])
+        colorArr.append(-1)
 
     edges = []
     for i in range(1, edge_count + 1):
         line = lines[i]
         parts = line.split()
-        edges.append((int(parts[0]), int(parts[1])))
+        Graph[int(parts[0])].append(int(parts[1]))
+        Graph[int(parts[1])].append(int(parts[0]))
 
     # build a trivial solution
     # every node has its own color
-    solution = range(0, node_count)
+
+    ask = DFS(colorArr, Graph, 0, 10)
+    solution = []
+    if ask == true:
+        while not q.empty():
+            solution.append(q.get())
+
+
 
     # prepare the solution in the specified output format
     output_data = str(node_count) + ' ' + str(0) + '\n'
